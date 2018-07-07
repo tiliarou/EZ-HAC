@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.TitleLabel = new System.Windows.Forms.Label();
-            this.BuildLabel = new System.Windows.Forms.Label();
             this.HactoolVersion = new System.Windows.Forms.Label();
             this.HacTab = new System.Windows.Forms.TabControl();
             this.XciExtractionTab = new System.Windows.Forms.TabPage();
@@ -52,8 +51,7 @@
             this.NcaEmulatorExtract = new System.Windows.Forms.CheckBox();
             this.NcaExtract = new System.Windows.Forms.Button();
             this.DescriptionLabel = new System.Windows.Forms.Label();
-            this.HacProgress = new System.Windows.Forms.ProgressBar();
-            this.ProgressLabel = new System.Windows.Forms.Label();
+            this.SettingsButton = new System.Windows.Forms.Button();
             this.HacTab.SuspendLayout();
             this.XciExtractionTab.SuspendLayout();
             this.NcaExtractionTab.SuspendLayout();
@@ -69,19 +67,10 @@
             this.TitleLabel.TabIndex = 1;
             this.TitleLabel.Text = "EZ-HAC";
             // 
-            // BuildLabel
-            // 
-            this.BuildLabel.AutoSize = true;
-            this.BuildLabel.Location = new System.Drawing.Point(154, 27);
-            this.BuildLabel.Name = "BuildLabel";
-            this.BuildLabel.Size = new System.Drawing.Size(38, 13);
-            this.BuildLabel.TabIndex = 2;
-            this.BuildLabel.Text = "? build";
-            // 
             // HactoolVersion
             // 
             this.HactoolVersion.AutoSize = true;
-            this.HactoolVersion.Location = new System.Drawing.Point(238, 27);
+            this.HactoolVersion.Location = new System.Drawing.Point(154, 27);
             this.HactoolVersion.Name = "HactoolVersion";
             this.HactoolVersion.Size = new System.Drawing.Size(83, 13);
             this.HactoolVersion.TabIndex = 3;
@@ -140,6 +129,8 @@
             this.XciOutputPath.Name = "XciOutputPath";
             this.XciOutputPath.Size = new System.Drawing.Size(181, 20);
             this.XciOutputPath.TabIndex = 4;
+            this.XciOutputPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.XciOutputPath_DragDrop);
+            this.XciOutputPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.XciOutputPath_DragEnter);
             // 
             // XciExtract
             // 
@@ -176,6 +167,8 @@
             this.XciPath.Name = "XciPath";
             this.XciPath.Size = new System.Drawing.Size(202, 20);
             this.XciPath.TabIndex = 0;
+            this.XciPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.XciPath_DragDrop);
+            this.XciPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.XciPath_DragEnter);
             // 
             // NcaExtractionTab
             // 
@@ -239,6 +232,8 @@
             this.NcaOutputPath.Name = "NcaOutputPath";
             this.NcaOutputPath.Size = new System.Drawing.Size(181, 20);
             this.NcaOutputPath.TabIndex = 10;
+            this.NcaOutputPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.NcaOutputPath_DragDrop);
+            this.NcaOutputPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.NcaOutputPath_DragEnter);
             // 
             // NcaBrowse
             // 
@@ -265,6 +260,8 @@
             this.NcaPath.Name = "NcaPath";
             this.NcaPath.Size = new System.Drawing.Size(197, 20);
             this.NcaPath.TabIndex = 7;
+            this.NcaPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.NcaPath_DragDrop);
+            this.NcaPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.NcaPath_DragEnter);
             // 
             // NcaEmulatorExtract
             // 
@@ -295,33 +292,25 @@
             this.DescriptionLabel.TabIndex = 7;
             this.DescriptionLabel.Text = "Description: ";
             // 
-            // HacProgress
+            // SettingsButton
             // 
-            this.HacProgress.Location = new System.Drawing.Point(261, 443);
-            this.HacProgress.Name = "HacProgress";
-            this.HacProgress.Size = new System.Drawing.Size(100, 14);
-            this.HacProgress.TabIndex = 8;
-            // 
-            // ProgressLabel
-            // 
-            this.ProgressLabel.AutoSize = true;
-            this.ProgressLabel.Location = new System.Drawing.Point(204, 443);
-            this.ProgressLabel.Name = "ProgressLabel";
-            this.ProgressLabel.Size = new System.Drawing.Size(51, 13);
-            this.ProgressLabel.TabIndex = 9;
-            this.ProgressLabel.Text = "Progress:";
+            this.SettingsButton.Location = new System.Drawing.Point(288, 13);
+            this.SettingsButton.Name = "SettingsButton";
+            this.SettingsButton.Size = new System.Drawing.Size(75, 23);
+            this.SettingsButton.TabIndex = 8;
+            this.SettingsButton.Text = "Settings";
+            this.SettingsButton.UseVisualStyleBackColor = true;
+            this.SettingsButton.Click += new System.EventHandler(this.SettingsButton_Click);
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(375, 463);
-            this.Controls.Add(this.ProgressLabel);
-            this.Controls.Add(this.HacProgress);
+            this.Controls.Add(this.SettingsButton);
             this.Controls.Add(this.DescriptionLabel);
             this.Controls.Add(this.HacTab);
             this.Controls.Add(this.HactoolVersion);
-            this.Controls.Add(this.BuildLabel);
             this.Controls.Add(this.TitleLabel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -339,7 +328,6 @@
 
         #endregion
         private System.Windows.Forms.Label TitleLabel;
-        private System.Windows.Forms.Label BuildLabel;
         private System.Windows.Forms.Label HactoolVersion;
         private System.Windows.Forms.TabControl HacTab;
         private System.Windows.Forms.TabPage XciExtractionTab;
@@ -360,10 +348,9 @@
         private System.Windows.Forms.Button NcaBrowse;
         private System.Windows.Forms.Label NcaFileLabel;
         private System.Windows.Forms.TextBox NcaPath;
-        private System.Windows.Forms.ProgressBar HacProgress;
-        private System.Windows.Forms.Label ProgressLabel;
         private System.Windows.Forms.TextBox NcaTitleKey;
         private System.Windows.Forms.Label NcaTitleKeyLabel;
+        private System.Windows.Forms.Button SettingsButton;
     }
 }
 

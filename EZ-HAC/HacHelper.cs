@@ -8,16 +8,22 @@ using System.Windows.Forms;
 
 namespace EZ_HAC
 {
-    class HacChecks
+    class HacHelper
     {
-        private static HacInfo[] VerifiedHacVersions =
+        private struct HacInfo
         {
-            new HacInfo { FileHash = "1f609b4d4814e238522b54a49f7a5251", VersionId = "1.1.0" },
-            new HacInfo { FileHash = "8a99a879262036eb2ed12d92f358ce56", VersionId = "1.0.1" },
-            new HacInfo { FileHash = "f3433e97261c1f8d907aa2bbc5ffa024", VersionId = "1.0.0" }
+            public string FileHash;
+            public string VersionString;
+        }
+
+        private static HacInfo[] HacVersions =
+        {
+            new HacInfo { FileHash = "1f609b4d4814e238522b54a49f7a5251", VersionString = "1.1.0" },
+            new HacInfo { FileHash = "8a99a879262036eb2ed12d92f358ce56", VersionString = "1.0.1" },
+            new HacInfo { FileHash = "f3433e97261c1f8d907aa2bbc5ffa024", VersionString = "1.0.0" }
         };
 
-        public static string HacVersionId;
+        public static string HacVersionString;
 
         public static void RunChecks()
         {
@@ -41,14 +47,14 @@ namespace EZ_HAC
             Console.WriteLine($"hactool Executable File Hash: {HacHash}");
 #endif
 
-            for (int Index = 0; Index < VerifiedHacVersions.Length; Index++)
+            for (int Index = 0; Index < HacVersions.Length; Index++)
             {
-                HacInfo HacVersionInfo = VerifiedHacVersions[Index];
+                HacInfo HacVersionInfo = HacVersions[Index];
 
                 if (HacVersionInfo.FileHash == HacHash)
                 {
                     InvalidHash  = false;
-                    HacVersionId = HacVersionInfo.VersionId;
+                    HacVersionString = HacVersionInfo.VersionString;
                 }
             }
 
@@ -65,7 +71,7 @@ namespace EZ_HAC
                 else
                 {
 #endif
-                    HacVersionId = "Unknown";
+                    HacVersionString = "Unknown";
 #if !DEBUG
                 }
 #endif

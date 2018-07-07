@@ -13,32 +13,42 @@ namespace EZ_HAC
 {
     public partial class FormMain : Form
     {
-        Process Hactool;
+        HacRunner Hactool;
 
         public FormMain()
         {
-            HacChecks.RunChecks();
+            HacHelper.RunChecks();
 
             InitializeComponent();
 
-#if !DEBUG
-            BuildLabel.Text = "Release build";
-#else
-            BuildLabel.Text = "Debug build";
-#endif
+            Hactool = new HacRunner();
 
-            HactoolVersion.Text += " " + HacChecks.HacVersionId;
+            HactoolVersion.Text += " " + HacHelper.HacVersionString;
 
-            Hactool = new Process();
-
-            Hactool.StartInfo.FileName = "hactool.exe";
-
-            Hactool.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            SetExtractionTextBoxesDragDrop();
         }
 
         private void UpdateDescription(string Text)
         {
-            DescriptionLabel.Text = "Description: " + Text;
+            DescriptionLabel.Text = $"Description: {Text}";
+        }
+
+        private void SetAllPagesStatus(bool Status)
+        {
+            foreach (TabPage Page in HacTab.TabPages) Page.Enabled = Status;
+        }
+
+        private void SetExtractionTextBoxesDragDrop()
+        {
+            XciPath.AllowDrop       = true;
+            XciOutputPath.AllowDrop = true;
+            NcaPath.AllowDrop       = true;
+            NcaOutputPath.AllowDrop = true;
+        }
+
+        private void SettingsButton_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Coming soon...", "Notice.", MessageBoxButtons.OK);
         }
 
         private void XciExtractionTab_Enter(object sender, EventArgs e)
@@ -51,131 +61,88 @@ namespace EZ_HAC
             UpdateDescription("Extract all NCA contents.");
         }
 
+        private void XciExtract_Click(object sender, EventArgs e)
+        {
+            if (XciPath.Text == string.Empty)
+            {
+                MessageBox.Show("Invalid XCI path!", "Error.", MessageBoxButtons.OK);
+                return;
+            }
+            else if (XciOutputPath.Text == string.Empty)
+            {
+                MessageBox.Show("Invalid XCI output path!", "Error.", MessageBoxButtons.OK);
+                return;
+            }
+
+            SetAllPagesStatus(false);
+
+            Hactool.RunHactoolCommand($"-k keys.dat -t xci \"{XciPath.Text}\" --outdir=\"{XciOutputPath.Text}\"");
+
+            SetAllPagesStatus(true);
+
+            MessageBox.Show("Done extracting XCI contents!", "Done.", MessageBoxButtons.OK);
+        }
+
         private void NcaExtract_Click(object sender, EventArgs e)
         {
-            if (NcaPath.Text == "")
+            if (NcaPath.Text == string.Empty)
             {
-                MessageBox.Show("Invalid NCA path!", "Warning!", MessageBoxButtons.OK);
+                MessageBox.Show("Invalid NCA path!", "Error.", MessageBoxButtons.OK);
                 return;
             }
-
-            if (NcaOutputPath.Text == "")
+            else if (NcaOutputPath.Text == string.Empty)
             {
-                MessageBox.Show("Invalid NCA output path!", "Warning!", MessageBoxButtons.OK);
+                MessageBox.Show("Invalid NCA output path!", "Error.", MessageBoxButtons.OK);
                 return;
             }
+            else if (NcaTitleKey.Text != string.Empty)
+            {
+                if (NcaTitleKey.Text.Length > 32 || NcaTitleKey.Text.Length < 32)
+                {
+                    MessageBox.Show("Invalid title key!", "Error.", MessageBoxButtons.OK);
+                    return;
+                }
+            }
 
-            foreach (TabPage Page in HacTab.TabPages) Page.Enabled = false;
-
-            HacProgress.Maximum = 100;
-            HacProgress.Step    = 50;
+            SetAllPagesStatus(false);
 
             if (NcaEmulatorExtract.Checked)
             {
-                if (NcaTitleKey.Text != "")
+                if (NcaTitleKey.Text != string.Empty)
                 {
-                    HacProgress.PerformStep();
-
-                    Hactool.StartInfo.Arguments = "-k keys.dat --titlekey=" + NcaTitleKey.Text + " \"" + NcaPath.Text + "\" --section0dir=\"" + NcaOutputPath.Text + "\"";
-                    Hactool.Start();
-                    Hactool.WaitForExit();
-
-                    HacProgress.PerformStep();
-
-                    Hactool.StartInfo.Arguments = "-k keys.dat --titlekey=" + NcaTitleKey.Text + " \"" + NcaPath.Text + "\" --romfs=\"" + NcaOutputPath.Text + "/main.romfs\"";
-                    Hactool.Start();
-                    Hactool.WaitForExit();
+                    Hactool.RunHactoolCommand($"-k keys.dat --titlekey={NcaTitleKey.Text} \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}\" --romfs=\"{NcaOutputPath.Text}/main.romfs\"");
                 }
                 else
                 {
-                    HacProgress.PerformStep();
-
-                    Hactool.StartInfo.Arguments = "-k keys.dat \"" + NcaPath.Text + "\" --section0dir=\"" + NcaOutputPath.Text + "\"";
-                    Hactool.Start();
-                    Hactool.WaitForExit();
-
-                    HacProgress.PerformStep();
-
-                    Hactool.StartInfo.Arguments = "-k keys.dat \"" + NcaPath.Text + "\" --romfs=\"" + NcaOutputPath.Text + "/main.romfs\"";
-                    Hactool.Start();
-                    Hactool.WaitForExit();
+                    Hactool.RunHactoolCommand($"-k keys.dat \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}\" --romfs=\"{NcaOutputPath.Text}/main.romfs\"");
                 }
             }
             else
             {
-                if (NcaTitleKey.Text != "")
+                if (NcaTitleKey.Text != string.Empty)
                 {
-                    HacProgress.PerformStep();
-
-                    Hactool.StartInfo.Arguments = "-k keys.dat --titlekey=" + NcaTitleKey.Text + " \"" + NcaPath.Text + "\" --section0dir=\"" + NcaOutputPath.Text + "/exefs\"";
-                    Hactool.Start();
-                    Hactool.WaitForExit();
-
-                    HacProgress.PerformStep();
-
-                    Hactool.StartInfo.Arguments = "-k keys.dat --titlekey=" + NcaTitleKey.Text + " \"" + NcaPath.Text + "\" --romfsdir=\"" + NcaOutputPath.Text + "/romfs\"";
-                    Hactool.Start();
-                    Hactool.WaitForExit();
+                    Hactool.RunHactoolCommand($"-k keys.dat --titlekey={NcaTitleKey.Text} \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}/exefs\" --romfsdir=\"{NcaOutputPath.Text}/romfs\"");
                 }
                 else
                 {
-                    HacProgress.PerformStep();
-
-                    Hactool.StartInfo.Arguments = "-k keys.dat \"" + NcaPath.Text + "\" --section0dir=\"" + NcaOutputPath.Text + "/exefs\"";
-                    Hactool.Start();
-                    Hactool.WaitForExit();
-
-                    HacProgress.PerformStep();
-
-                    Hactool.StartInfo.Arguments = "-k keys.dat \"" + NcaPath.Text + "\" --romfsdir=\"" + NcaOutputPath.Text + "/romfs\"";
-                    Hactool.Start();
-                    Hactool.WaitForExit();
+                    Hactool.RunHactoolCommand($"-k keys.dat \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}/exefs\" --romfsdir=\"{NcaOutputPath.Text}/romfs\"");
                 }
             }
 
-            HacProgress.Value = 0;
+            SetAllPagesStatus(true);
 
-            foreach (TabPage Page in HacTab.TabPages) Page.Enabled = true;
-
-            MessageBox.Show("Done extracting NCA contents!", "Done!", MessageBoxButtons.OK);
-        }
-
-        private void NcaBrowse_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog NcaDialog = new OpenFileDialog();
-
-            NcaDialog.Title            = "Browse for NCA file";
-            NcaDialog.Filter           = "NCA file (*.nca)|*.nca";
-            NcaDialog.FilterIndex      = 1;
-            NcaDialog.RestoreDirectory = true;
-
-            if (NcaDialog.ShowDialog() == DialogResult.OK)
-            {
-                NcaPath.Text = NcaDialog.FileName;
-            }
-        }
-
-        private void NcaOutputBrowse_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog NcaOutputDialog = new FolderBrowserDialog();
-
-            NcaOutputDialog.Description  = "Browse for NCA output folder";
-            NcaOutputDialog.SelectedPath = Application.StartupPath;
-
-            if (NcaOutputDialog.ShowDialog() == DialogResult.OK)
-            {
-                NcaOutputPath.Text = NcaOutputDialog.SelectedPath;
-            }
+            MessageBox.Show("Done extracting NCA contents!", "Done.", MessageBoxButtons.OK);
         }
 
         private void XciBrowse_Click(object sender, EventArgs e)
         {
-            OpenFileDialog XciDialog = new OpenFileDialog();
-
-            XciDialog.Title            = "Browse for XCI file";
-            XciDialog.Filter           = "XCI file (*.xci)|*.xci";
-            XciDialog.FilterIndex      = 1;
-            XciDialog.RestoreDirectory = true;
+            OpenFileDialog XciDialog = new OpenFileDialog()
+            {
+                Title            = "Browse for XCI file",
+                Filter           = "XCI file (*.xci)|*.xci",
+                FilterIndex      = 1,
+                RestoreDirectory = true
+            };
 
             if (XciDialog.ShowDialog() == DialogResult.OK)
             {
@@ -196,36 +163,102 @@ namespace EZ_HAC
             }
         }
 
-        private void XciExtract_Click(object sender, EventArgs e)
+        private void NcaBrowse_Click(object sender, EventArgs e)
         {
-            if (XciPath.Text == "")
+            OpenFileDialog NcaDialog = new OpenFileDialog()
             {
-                MessageBox.Show("Invalid XCI path!", "Error!", MessageBoxButtons.OK);
-                return;
-            }
+                Title            = "Browse for NCA file",
+                Filter           = "NCA file (*.nca)|*.nca",
+                FilterIndex      = 1,
+                RestoreDirectory = true
+            };
 
-            if (XciOutputPath.Text == "")
+            if (NcaDialog.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show("Invalid XCI output path!", "Error!", MessageBoxButtons.OK);
-                return;
+                NcaPath.Text = NcaDialog.FileName;
             }
+        }
 
-            foreach (TabPage Page in HacTab.TabPages) Page.Enabled = false;
+        private void NcaOutputBrowse_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog NcaOutputDialog = new FolderBrowserDialog()
+            {
+                Description  = "Browse for NCA output folder",
+                SelectedPath = Application.StartupPath
+            };
 
-            HacProgress.Maximum = 100;
-            HacProgress.Step    = 100;
+            if (NcaOutputDialog.ShowDialog() == DialogResult.OK)
+            {
+                NcaOutputPath.Text = NcaOutputDialog.SelectedPath;
+            }
+        }
 
-            HacProgress.PerformStep();
+        private void NcaPath_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
 
-            Hactool.StartInfo.Arguments = "-k keys.dat -t xci \"" + XciPath.Text + "\" --outdir=\"" + XciOutputPath.Text + "\"";
-            Hactool.Start();
-            Hactool.WaitForExit();
+        private void NcaPath_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] FileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+                NcaPath.Lines      = FileNames;
+            }
+        }
 
-            HacProgress.Value = 0;
+        private void NcaOutputPath_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
 
-            foreach (TabPage Page in HacTab.TabPages) Page.Enabled = true;
+        private void NcaOutputPath_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] FileNames  = (string[])e.Data.GetData(DataFormats.FileDrop);
+                NcaOutputPath.Lines = FileNames;
+            }
+        }
 
-            MessageBox.Show("Done extracting XCI contents!", "Done!", MessageBoxButtons.OK);
+        private void XciPath_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void XciPath_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] FileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+                XciPath.Lines      = FileNames;
+            }
+        }
+
+        private void XciOutputPath_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void XciOutputPath_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] FileNames  = (string[])e.Data.GetData(DataFormats.FileDrop);
+                XciOutputPath.Lines = FileNames;
+            }
         }
     }
 }
