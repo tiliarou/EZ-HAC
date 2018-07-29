@@ -1,12 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace EZ_HAC
@@ -25,7 +17,7 @@ namespace EZ_HAC
 
             HactoolVersion.Text += " " + HacHelper.HacVersionString;
 
-            SetExtractionTextBoxesDragDrop();
+            SetTextBoxesDragDrop();
         }
 
         private void UpdateDescription(string Text)
@@ -38,12 +30,19 @@ namespace EZ_HAC
             foreach (TabPage Page in HacTab.TabPages) Page.Enabled = Status;
         }
 
-        private void SetExtractionTextBoxesDragDrop()
+        private void SetTextBoxesDragDrop()
         {
-            XciPath.AllowDrop       = true;
-            XciOutputPath.AllowDrop = true;
-            NcaPath.AllowDrop       = true;
-            NcaOutputPath.AllowDrop = true;
+            XciPath.AllowDrop         = true;
+            XciOutputPath.AllowDrop   = true;
+            NcaPath.AllowDrop         = true;
+            NcaOutputPath.AllowDrop   = true;
+            RomFsPath.AllowDrop       = true;
+            RomFsOutputPath.AllowDrop = true;
+        }
+
+        private void ActionCompleted()
+        {
+            MessageBox.Show("Action completed!", "Done.", MessageBoxButtons.OK);
         }
 
         private void SettingsButton_Click(object sender, EventArgs e)
@@ -61,6 +60,11 @@ namespace EZ_HAC
             UpdateDescription("Extract all NCA contents.");
         }
 
+        private void RomFsExtractionTab_Enter(object sender, EventArgs e)
+        {
+            UpdateDescription("Extract all RomFS contents.");
+        }
+
         private void XciExtract_Click(object sender, EventArgs e)
         {
             if (XciPath.Text == string.Empty)
@@ -76,11 +80,11 @@ namespace EZ_HAC
 
             SetAllPagesStatus(false);
 
-            Hactool.RunHactoolCommand($"-k keys.dat -t xci \"{XciPath.Text}\" --outdir=\"{XciOutputPath.Text}\"");
+            Hactool.RunCommand($"-k keys.dat -t xci \"{XciPath.Text}\" --outdir=\"{XciOutputPath.Text}\"");
 
             SetAllPagesStatus(true);
 
-            MessageBox.Show("Done extracting XCI contents!", "Done.", MessageBoxButtons.OK);
+            ActionCompleted();
         }
 
         private void NcaExtract_Click(object sender, EventArgs e)
@@ -110,28 +114,50 @@ namespace EZ_HAC
             {
                 if (NcaTitleKey.Text != string.Empty)
                 {
-                    Hactool.RunHactoolCommand($"-k keys.dat --titlekey={NcaTitleKey.Text} \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}\" --romfs=\"{NcaOutputPath.Text}/main.romfs\"");
+                    Hactool.RunCommand($"-k keys.dat --titlekey={NcaTitleKey.Text} \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}\" --romfs=\"{NcaOutputPath.Text}/main.romfs\"");
                 }
                 else
                 {
-                    Hactool.RunHactoolCommand($"-k keys.dat \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}\" --romfs=\"{NcaOutputPath.Text}/main.romfs\"");
+                    Hactool.RunCommand($"-k keys.dat \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}\" --romfs=\"{NcaOutputPath.Text}/main.romfs\"");
                 }
             }
             else
             {
                 if (NcaTitleKey.Text != string.Empty)
                 {
-                    Hactool.RunHactoolCommand($"-k keys.dat --titlekey={NcaTitleKey.Text} \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}/exefs\" --romfsdir=\"{NcaOutputPath.Text}/romfs\"");
+                    Hactool.RunCommand($"-k keys.dat --titlekey={NcaTitleKey.Text} \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}/exefs\" --romfsdir=\"{NcaOutputPath.Text}/romfs\"");
                 }
                 else
                 {
-                    Hactool.RunHactoolCommand($"-k keys.dat \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}/exefs\" --romfsdir=\"{NcaOutputPath.Text}/romfs\"");
+                    Hactool.RunCommand($"-k keys.dat \"{NcaPath.Text}\" --section0dir=\"{NcaOutputPath.Text}/exefs\" --romfsdir=\"{NcaOutputPath.Text}/romfs\"");
                 }
             }
 
             SetAllPagesStatus(true);
 
-            MessageBox.Show("Done extracting NCA contents!", "Done.", MessageBoxButtons.OK);
+            ActionCompleted();
+        }
+
+        private void RomFsExtract_Click(object sender, EventArgs e)
+        {
+            if (RomFsPath.Text == string.Empty)
+            {
+                MessageBox.Show("Invalid RomFS path!", "Error.", MessageBoxButtons.OK);
+                return;
+            }
+            else if (RomFsOutputPath.Text == string.Empty)
+            {
+                MessageBox.Show("Invalid RomFS output path!", "Error.", MessageBoxButtons.OK);
+                return;
+            }
+
+            SetAllPagesStatus(false);
+
+            Hactool.RunCommand($"-t romfs \"{RomFsPath.Text}\" --romfsdir=\"{RomFsOutputPath.Text}\"");
+
+            SetAllPagesStatus(true);
+
+            ActionCompleted();
         }
 
         private void XciBrowse_Click(object sender, EventArgs e)
@@ -139,7 +165,7 @@ namespace EZ_HAC
             OpenFileDialog XciDialog = new OpenFileDialog()
             {
                 Title            = "Browse for XCI file",
-                Filter           = "XCI file (*.xci)|*.xci",
+                Filter           = "XCI File (*.xci)|*.xci",
                 FilterIndex      = 1,
                 RestoreDirectory = true
             };
@@ -168,7 +194,7 @@ namespace EZ_HAC
             OpenFileDialog NcaDialog = new OpenFileDialog()
             {
                 Title            = "Browse for NCA file",
-                Filter           = "NCA file (*.nca)|*.nca",
+                Filter           = "NCA File (*.nca)|*.nca",
                 FilterIndex      = 1,
                 RestoreDirectory = true
             };
@@ -190,6 +216,36 @@ namespace EZ_HAC
             if (NcaOutputDialog.ShowDialog() == DialogResult.OK)
             {
                 NcaOutputPath.Text = NcaOutputDialog.SelectedPath;
+            }
+        }
+
+        private void RomFsBrowse_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog RomFsDialog = new OpenFileDialog()
+            {
+                Title            = "Browse for RomFS file",
+                Filter           = "RomFS Files (*.romfs, *.istorage)|*.romfs;*.istorage",
+                FilterIndex      = 1,
+                RestoreDirectory = true
+            };
+
+            if (RomFsDialog.ShowDialog() == DialogResult.OK)
+            {
+                RomFsPath.Text = RomFsDialog.FileName;
+            }
+        }
+
+        private void RomFsOutputBrowse_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog RomFsOutputDialog = new FolderBrowserDialog()
+            {
+                Description  = "Browse for RomFS output folder",
+                SelectedPath = Application.StartupPath
+            };
+
+            if (RomFsOutputDialog.ShowDialog() == DialogResult.OK)
+            {
+                RomFsOutputPath.Text = RomFsOutputDialog.SelectedPath;
             }
         }
 
@@ -258,6 +314,40 @@ namespace EZ_HAC
             {
                 string[] FileNames  = (string[])e.Data.GetData(DataFormats.FileDrop);
                 XciOutputPath.Lines = FileNames;
+            }
+        }
+
+        private void RomFsPath_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void RomFsPath_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] FileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+                RomFsPath.Lines    = FileNames;
+            }
+        }
+
+        private void RomFsOutputPath_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void RomFsOutputPath_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] FileNames    = (string[])e.Data.GetData(DataFormats.FileDrop);
+                RomFsOutputPath.Lines = FileNames;
             }
         }
     }

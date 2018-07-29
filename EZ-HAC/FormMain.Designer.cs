@@ -50,18 +50,27 @@
             this.NcaPath = new System.Windows.Forms.TextBox();
             this.NcaEmulatorExtract = new System.Windows.Forms.CheckBox();
             this.NcaExtract = new System.Windows.Forms.Button();
+            this.RomFsExtractionTab = new System.Windows.Forms.TabPage();
+            this.RomFsExtract = new System.Windows.Forms.Button();
+            this.RomFsOutputLabel = new System.Windows.Forms.Label();
+            this.RomFsOutputBrowse = new System.Windows.Forms.Button();
+            this.RomFsOutputPath = new System.Windows.Forms.TextBox();
+            this.RomFsBrowse = new System.Windows.Forms.Button();
+            this.RomFsFileLabel = new System.Windows.Forms.Label();
+            this.RomFsPath = new System.Windows.Forms.TextBox();
             this.DescriptionLabel = new System.Windows.Forms.Label();
             this.SettingsButton = new System.Windows.Forms.Button();
             this.HacTab.SuspendLayout();
             this.XciExtractionTab.SuspendLayout();
             this.NcaExtractionTab.SuspendLayout();
+            this.RomFsExtractionTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // TitleLabel
             // 
             this.TitleLabel.AutoSize = true;
             this.TitleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TitleLabel.Location = new System.Drawing.Point(12, 9);
+            this.TitleLabel.Location = new System.Drawing.Point(5, 9);
             this.TitleLabel.Name = "TitleLabel";
             this.TitleLabel.Size = new System.Drawing.Size(136, 37);
             this.TitleLabel.TabIndex = 1;
@@ -70,7 +79,7 @@
             // HactoolVersion
             // 
             this.HactoolVersion.AutoSize = true;
-            this.HactoolVersion.Location = new System.Drawing.Point(154, 27);
+            this.HactoolVersion.Location = new System.Drawing.Point(136, 27);
             this.HactoolVersion.Name = "HactoolVersion";
             this.HactoolVersion.Size = new System.Drawing.Size(83, 13);
             this.HactoolVersion.TabIndex = 3;
@@ -80,6 +89,7 @@
             // 
             this.HacTab.Controls.Add(this.XciExtractionTab);
             this.HacTab.Controls.Add(this.NcaExtractionTab);
+            this.HacTab.Controls.Add(this.RomFsExtractionTab);
             this.HacTab.Location = new System.Drawing.Point(12, 49);
             this.HacTab.Name = "HacTab";
             this.HacTab.SelectedIndex = 0;
@@ -283,6 +293,90 @@
             this.NcaExtract.UseVisualStyleBackColor = true;
             this.NcaExtract.Click += new System.EventHandler(this.NcaExtract_Click);
             // 
+            // RomFsExtractionTab
+            // 
+            this.RomFsExtractionTab.Controls.Add(this.RomFsExtract);
+            this.RomFsExtractionTab.Controls.Add(this.RomFsOutputLabel);
+            this.RomFsExtractionTab.Controls.Add(this.RomFsOutputBrowse);
+            this.RomFsExtractionTab.Controls.Add(this.RomFsOutputPath);
+            this.RomFsExtractionTab.Controls.Add(this.RomFsBrowse);
+            this.RomFsExtractionTab.Controls.Add(this.RomFsFileLabel);
+            this.RomFsExtractionTab.Controls.Add(this.RomFsPath);
+            this.RomFsExtractionTab.Location = new System.Drawing.Point(4, 22);
+            this.RomFsExtractionTab.Name = "RomFsExtractionTab";
+            this.RomFsExtractionTab.Padding = new System.Windows.Forms.Padding(3);
+            this.RomFsExtractionTab.Size = new System.Drawing.Size(343, 364);
+            this.RomFsExtractionTab.TabIndex = 2;
+            this.RomFsExtractionTab.Text = "Extract RomFS";
+            this.RomFsExtractionTab.UseVisualStyleBackColor = true;
+            this.RomFsExtractionTab.Enter += new System.EventHandler(this.RomFsExtractionTab_Enter);
+            // 
+            // RomFsExtract
+            // 
+            this.RomFsExtract.Location = new System.Drawing.Point(3, 323);
+            this.RomFsExtract.Name = "RomFsExtract";
+            this.RomFsExtract.Size = new System.Drawing.Size(337, 35);
+            this.RomFsExtract.TabIndex = 13;
+            this.RomFsExtract.Text = "Extract";
+            this.RomFsExtract.UseVisualStyleBackColor = true;
+            this.RomFsExtract.Click += new System.EventHandler(this.RomFsExtract_Click);
+            // 
+            // RomFsOutputLabel
+            // 
+            this.RomFsOutputLabel.AutoSize = true;
+            this.RomFsOutputLabel.Location = new System.Drawing.Point(6, 35);
+            this.RomFsOutputLabel.Name = "RomFsOutputLabel";
+            this.RomFsOutputLabel.Size = new System.Drawing.Size(67, 13);
+            this.RomFsOutputLabel.TabIndex = 12;
+            this.RomFsOutputLabel.Text = "Output Path:";
+            // 
+            // RomFsOutputBrowse
+            // 
+            this.RomFsOutputBrowse.Location = new System.Drawing.Point(266, 32);
+            this.RomFsOutputBrowse.Name = "RomFsOutputBrowse";
+            this.RomFsOutputBrowse.Size = new System.Drawing.Size(71, 20);
+            this.RomFsOutputBrowse.TabIndex = 11;
+            this.RomFsOutputBrowse.Text = "Browse";
+            this.RomFsOutputBrowse.UseVisualStyleBackColor = true;
+            this.RomFsOutputBrowse.Click += new System.EventHandler(this.RomFsOutputBrowse_Click);
+            // 
+            // RomFsOutputPath
+            // 
+            this.RomFsOutputPath.Location = new System.Drawing.Point(79, 32);
+            this.RomFsOutputPath.Name = "RomFsOutputPath";
+            this.RomFsOutputPath.Size = new System.Drawing.Size(181, 20);
+            this.RomFsOutputPath.TabIndex = 10;
+            this.RomFsOutputPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.RomFsOutputPath_DragDrop);
+            this.RomFsOutputPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.RomFsOutputPath_DragEnter);
+            // 
+            // RomFsBrowse
+            // 
+            this.RomFsBrowse.Location = new System.Drawing.Point(266, 6);
+            this.RomFsBrowse.Name = "RomFsBrowse";
+            this.RomFsBrowse.Size = new System.Drawing.Size(71, 20);
+            this.RomFsBrowse.TabIndex = 9;
+            this.RomFsBrowse.Text = "Browse";
+            this.RomFsBrowse.UseVisualStyleBackColor = true;
+            this.RomFsBrowse.Click += new System.EventHandler(this.RomFsBrowse_Click);
+            // 
+            // RomFsFileLabel
+            // 
+            this.RomFsFileLabel.AutoSize = true;
+            this.RomFsFileLabel.Location = new System.Drawing.Point(6, 8);
+            this.RomFsFileLabel.Name = "RomFsFileLabel";
+            this.RomFsFileLabel.Size = new System.Drawing.Size(64, 13);
+            this.RomFsFileLabel.TabIndex = 8;
+            this.RomFsFileLabel.Text = "RomFS File:";
+            // 
+            // RomFsPath
+            // 
+            this.RomFsPath.Location = new System.Drawing.Point(76, 6);
+            this.RomFsPath.Name = "RomFsPath";
+            this.RomFsPath.Size = new System.Drawing.Size(184, 20);
+            this.RomFsPath.TabIndex = 7;
+            this.RomFsPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.RomFsPath_DragDrop);
+            this.RomFsPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.RomFsPath_DragEnter);
+            // 
             // DescriptionLabel
             // 
             this.DescriptionLabel.AutoSize = true;
@@ -321,6 +415,8 @@
             this.XciExtractionTab.PerformLayout();
             this.NcaExtractionTab.ResumeLayout(false);
             this.NcaExtractionTab.PerformLayout();
+            this.RomFsExtractionTab.ResumeLayout(false);
+            this.RomFsExtractionTab.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -351,6 +447,14 @@
         private System.Windows.Forms.TextBox NcaTitleKey;
         private System.Windows.Forms.Label NcaTitleKeyLabel;
         private System.Windows.Forms.Button SettingsButton;
+        private System.Windows.Forms.TabPage RomFsExtractionTab;
+        private System.Windows.Forms.Button RomFsExtract;
+        private System.Windows.Forms.Label RomFsOutputLabel;
+        private System.Windows.Forms.Button RomFsOutputBrowse;
+        private System.Windows.Forms.TextBox RomFsOutputPath;
+        private System.Windows.Forms.Button RomFsBrowse;
+        private System.Windows.Forms.Label RomFsFileLabel;
+        private System.Windows.Forms.TextBox RomFsPath;
     }
 }
 

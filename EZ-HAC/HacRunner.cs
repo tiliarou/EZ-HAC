@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 
 namespace EZ_HAC
 {
@@ -19,7 +15,7 @@ namespace EZ_HAC
             Hactool.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         }
 
-        public void RunHactoolCommand(string Args)
+        public void RunCommand(string Args)
         {
             Hactool.StartInfo.Arguments = Args;
             Hactool.Start();
